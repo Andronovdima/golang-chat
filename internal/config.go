@@ -13,7 +13,7 @@ func NewConfig() *Config {
 		BindAddr:		":8070",
 		LogLevel:		"debug",
 		SessionKey:		"jdfhdfdj",
-		DatabaseURL:	"host=localhost dbname=postgres sslmode=disable port=5431 password=1234 user=d",
+		DatabaseURL:	"host=localhost dbname=postgres sslmode=disable port=5432 password=1234 user=d",
 		ClientUrl:		"http://127.0.0.1:9000",
 		//ClientUrl:		"https://comandus.now.sh",
 	}

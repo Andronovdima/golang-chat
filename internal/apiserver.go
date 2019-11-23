@@ -1,7 +1,8 @@
 package apiserver
 
 import (
-	"Golang/FworkChat/golang-chat/internal/store"
+	"github.com/Andronovdima/golang-chat/internal/store"
+	_ "github.com/lib/pq"
 	"database/sql"
 	"log"
 	"net/http"
@@ -23,7 +24,7 @@ func Start() error {
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
-		port = ":8080"
+		port = config.BindAddr
 	} else {
 		port = ":" + port
 	}

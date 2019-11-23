@@ -1,7 +1,8 @@
 package delivery
 
 import (
-	"Golang/FworkChat/golang-chat/internal/app/chat"
+	"github.com/Andronovdima/golang-chat/internal/app/admin/general"
+	"github.com/Andronovdima/golang-chat/internal/app/chat"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -15,10 +16,12 @@ func NewChatHandler(m *mux.Router, uc chat.Usecase) {
 		ChatUsecase:	uc,
 	}
 
-	m.HandleFunc("/chat", handler.HandleChat).Methods(http.MethodPut, http.MethodOptions)
+	m.HandleFunc("/", handler.HandleChat).Methods(http.MethodPut, http.MethodOptions)
+	m.Handle("/" , )
 }
 
 
 func (c *ChatHandler) HandleChat(w http.ResponseWriter, r *http.Request) {
-// TODO
+
+	general.Respond(w, r , http.StatusOK, "Hello from world")
 }
