@@ -99,14 +99,46 @@ func (c *Client) listenRead() {
 
 		// read data from websocket connection
 		default:
-			var msg model.Message
+			/*var msg model.Message
 			err := websocket.JSON.Receive(c.ws, &msg)
+
 			if err == io.EOF {
 				c.doneCh <- true
 			} else if err != nil {
 				c.server.Err(err)
 			} else {
 				c.server.SendAll(&msg)
+			}*/
+			var input model.Input
+			err := websocket.JSON.Receive(c.ws, &input)
+			if err == io.EOF {
+				c.doneCh <- true
+			} else if err != nil {
+				c.server.errCh <- err
+			} else {
+				if input.Action == "init" {
+					c.userId = input.Payload.AccountID
+					chat, err := c.server.ChatUcase.Create(c.userId)
+					if err != nil {
+						c.server.errCh <- err
+					}
+					messages, err := c.server.MesUcase.ListByUser(c.userId)
+					if err != nil {
+						c.server.errCh <- err
+					}
+					for _, msg := range messages {
+						if msg.ChatID == chat.ID {
+							c.server.sendAll(msg)
+						}
+					}
+				} else {
+					var msg model.Message
+					msg.SenderID = c.userId
+					err := c.server.MesUcase.Create(&msg)
+					if err != nil {
+						c.server.errCh <- err
+					}
+				}
 			}
 		}
 	}

@@ -3,6 +3,9 @@ package internal
 import (
 	"database/sql"
 	"encoding/json"
+	"github.com/Andronovdima/golang-chat/internal/app/chat"
+	repository2 "github.com/Andronovdima/golang-chat/internal/app/chat/repository"
+	chatusecase "github.com/Andronovdima/golang-chat/internal/app/chat/usecase"
 	"github.com/Andronovdima/golang-chat/internal/app/message"
 	"github.com/Andronovdima/golang-chat/internal/app/message/repository"
 	"github.com/Andronovdima/golang-chat/internal/app/message/usecase"
@@ -23,7 +26,8 @@ type Server struct {
 	sendAllCh chan *model.Message
 	doneCh    chan bool
 	errCh     chan error
-	mesucase	message.Usecase
+	MesUcase  message.Usecase
+	ChatUcase chat.Usecase
 }
 
 // Create new app server.
@@ -45,6 +49,7 @@ func NewServer(pattern string, db *sql.DB) *Server {
 		doneCh,
 		errCh,
 		usecase.NewMessageUsecase(repository.NewMessageRepository(db)),
+		chatusecase.NewChatUsecase(repository2.NewChatRepository(db)),
 	}
 }
 
@@ -69,7 +74,7 @@ func (s *Server) Err(err error) {
 }
 
 func (s *Server) sendPastMessages(c *Client) {
-	messages, _ := s.mesucase.ListByUser(c.userId)
+	messages, _ := s.MesUcase.ListByUser(c.userId)
 	for _, msg := range messages {
 		c.Write(msg)
 	}
@@ -122,7 +127,7 @@ func (s *Server) Listen() {
 		// broadcast message for all clients
 		case msg := <-s.sendAllCh:
 			log.Println("Send all:", msg)
-			_ = s.mesucase.Create(msg)
+			_ = s.MesUcase.Create(msg)
 			//s.messages = append(s.messages, msg)
 			s.sendAll(msg)
 
