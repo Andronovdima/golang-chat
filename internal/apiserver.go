@@ -1,12 +1,10 @@
-package apiserver
+package internal
 
 import (
 	"database/sql"
 	"github.com/Andronovdima/golang-chat/internal/store"
 	_ "github.com/lib/pq"
-	"log"
 	"net/http"
-	"os"
 )
 
 type responseWriter struct {
@@ -21,38 +19,10 @@ func (w *responseWriter) WriteHeader(statusCode int) {
 
 func Start() error {
 	config := NewConfig()
-
-	port := os.Getenv("PORT")
-	if len(port) == 0 {
-		port = ":8080"
-	} else {
-		port = ":" + port
-	}
-	config.BindAddr = port
-
-	url :=  os.Getenv("DATABASE_URL")
-	if len(url) != 0 {
-		config.DatabaseURL = url
-	}
-
-	srv, err := NewServer(config)
-	if err != nil {
-		return err
-	}
-
-	db, err := newDB(config.DatabaseURL)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Println(err)
-		}
-	}()
-
-	srv.ConfigureServer(db)
-	return http.ListenAndServe(config.BindAddr, srv)
+	db, _ := newDB(config.DatabaseURL)
+	server := NewServer("/entry", db)
+	go server.Listen()
+	return http.ListenAndServe(":8080", nil)
 }
 
 func newDB(dbURL string) (*sql.DB, error) {
