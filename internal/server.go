@@ -81,8 +81,9 @@ func (s *Server) Err(err error) {
 
 func (s *Server) sendPastMessages(c *Client) {
 	messages, err := s.MessageUcase.ListByUser(c.dbId)
+	log.Println(messages)
 	if err != nil {
-		c.Done()
+		s.errCh <- err
 	}
 
 	for _, msg := range messages {
@@ -123,12 +124,17 @@ func (s *Server) Listen() {
 
 		// Add new a client
 		case c := <-s.addCh:
-			_, err := s.ChatUcase.FindByUser(c.dbId)
+			chat, err := s.ChatUcase.FindByUser(c.dbId)
 			if err != nil {
+				chat, err = s.ChatUcase.Create(c.dbId)
 				s.errCh <- err
 			}
+
+			c.chatID = chat.ID
+
 			s.clients[c.id] = c
 			log.Println("Now", len(s.clients), "clients connected.")
+			log.Println("chat id:", chat.ID)
 			s.sendPastMessages(c)
 
 		// del a client

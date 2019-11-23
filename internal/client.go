@@ -21,6 +21,7 @@ type Client struct {
 	server *Server
 	ch     chan *model.Message
 	doneCh chan bool
+	chatID int64
 }
 
 // Create new app client.
@@ -38,7 +39,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	ch := make(chan *model.Message, channelBufSize)
 	doneCh := make(chan bool)
 
-	return &Client{maxId, 66,ws, server, ch, doneCh}
+	return &Client{maxId, 66,ws, server, ch, doneCh, 0}
 }
 
 func (c *Client) Conn() *websocket.Conn {
@@ -73,7 +74,7 @@ func (c *Client) listenWrite() {
 
 		// send message to the client
 		case msg := <-c.ch:
-			msg.SenderID = c.dbId
+			//msg.SenderID = c.dbId
 			log.Println("Send:", msg)
 			websocket.JSON.Send(c.ws, msg)
 
