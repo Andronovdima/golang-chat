@@ -1,12 +1,11 @@
 package adminrepository
 
 import "database/sql"
-import "gith"//"github.com/golang-chat/internal/app/admin"
+import "github.com/Andronovdima/golang-chat/internal/app/admin"
 
 type AdminRepository struct {
 	db *sql.DB
 }
-
 
 func NewAdminRepository(db *sql.DB) admin.Repository {
 	return &AdminRepository{db}

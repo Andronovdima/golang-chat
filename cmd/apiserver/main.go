@@ -1,10 +1,10 @@
-package main
+package apiserver
 
 import (
 	"log"
 	"net/http"
 
-	"./app"
+	"../../internal/app"
 )
 
 func main() {
