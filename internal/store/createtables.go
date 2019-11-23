@@ -1,6 +1,8 @@
 package store
 
-import "database/sql"
+import (
+	"database/sql"
+)
 func CreateTables(db *sql.DB) error {
 	supportsQuery := `CREATE TABLE IF NOT EXISTS supports (
 		id bigserial not null primary key,
@@ -8,15 +10,6 @@ func CreateTables(db *sql.DB) error {
 	);`
 
 	if _, err := db.Exec(supportsQuery); err != nil {
-		return err
-	}
-
-	adminsQuery := `CREATE TABLE IF NOT EXISTS admins (
-		id bigserial not null primary key,
-		user_id integer
-	);`
-
-	if _, err := db.Exec(adminsQuery); err != nil {
 		return err
 	}
 
@@ -42,9 +35,10 @@ func CreateTables(db *sql.DB) error {
 
 	messagesQuery := `CREATE TABLE IF NOT EXISTS messages (
 		id bigserial not null primary key,
-		message varchar,
+		chat_id integer not null, 
 		sender_id integer not null,
 		receiver_id integer,
+		message varchar,
 		date timestamp
 	);`
 
@@ -52,3 +46,5 @@ func CreateTables(db *sql.DB) error {
 		return err
 	}
 
+	return nil
+}
