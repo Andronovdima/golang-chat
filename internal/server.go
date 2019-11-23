@@ -80,7 +80,7 @@ func (s *Server) Err(err error) {
 }
 
 func (s *Server) sendPastMessages(c *Client) {
-	messages, err := s.MessageUcase.ListByUser(int64(1))
+	messages, err := s.MessageUcase.ListByUser(c.dbId)
 	if err != nil {
 		c.Done()
 	}
@@ -123,7 +123,10 @@ func (s *Server) Listen() {
 
 		// Add new a client
 		case c := <-s.addCh:
-			log.Println("Added new client")
+			_, err := s.ChatUcase.FindByUser(c.dbId)
+			if err != nil {
+				s.errCh <- err
+			}
 			s.clients[c.id] = c
 			log.Println("Now", len(s.clients), "clients connected.")
 			s.sendPastMessages(c)
@@ -135,7 +138,6 @@ func (s *Server) Listen() {
 
 		// broadcast message for all clients
 		case msg := <-s.sendAllCh:
-			msg.SenderID = 1
 			err := s.MessageUcase.Create(msg)
 			log.Println("Created in db:", msg)
 			if err != nil {
