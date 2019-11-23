@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"strconv"
+	"time"
+)
 
 type Message struct {
 	ID 			int64
@@ -9,4 +12,8 @@ type Message struct {
 	ReceiverID 	int64
 	Message 	string
 	Date		time.Time
+}
+
+func (self *Message) String() string {
+	return strconv.Itoa(int(self.SenderID)) + " says " + self.Message
 }

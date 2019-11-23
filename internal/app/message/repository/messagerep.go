@@ -17,7 +17,7 @@ func NewMessageRepository(db *sql.DB) message.Repository {
 func (r *MessageRepository) Create(message *model.Message) error {
 	return r.db.QueryRow(
 		"INSERT INTO messages (chat_id, sender_id, receiver_id, message, date) " +
-			"VALUES ($1, $2, $3, $4) RETURNING id",
+			"VALUES ($1, $2, $3, $4, $5) RETURNING id",
 		message.ChatID,
 		message.SenderID,
 		message.ReceiverID,

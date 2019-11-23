@@ -136,6 +136,10 @@ func (s *Server) Listen() {
 		// broadcast message for all clients
 		case msg := <-s.sendAllCh:
 			log.Println("Send all:", msg)
+			err := s.MessageUcase.Create(msg)
+			if err != nil {
+				s.errCh <- err
+			}
 			s.sendAll(msg)
 
 		case err := <-s.errCh:
