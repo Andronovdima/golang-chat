@@ -7,6 +7,6 @@ type Input struct {
 
 
 type Payload struct{
-	AccountID int64
-	Message string
+	AccountId int64
+	Message Message
 }
