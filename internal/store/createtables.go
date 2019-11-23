@@ -1,6 +1,7 @@
 package store
 
 
-func CreateTables() {
+func CreateTables() error{
 
+	return nil
 }
