@@ -2,8 +2,10 @@ package internal
 
 import (
 	"database/sql"
+	"flag"
 	"github.com/Andronovdima/golang-chat/internal/store"
 	_ "github.com/lib/pq"
+	"log"
 	"net/http"
 )
 
@@ -17,12 +19,23 @@ func (w *responseWriter) WriteHeader(statusCode int) {
 	w.ResponseWriter.WriteHeader(statusCode)
 }
 
-func Start() error {
+func Start() {
+	flag.Parse()
+
 	config := NewConfig()
 	db, _ := newDB(config.DatabaseURL)
+
+	log.SetFlags(log.Lshortfile)
+
+	// websocket server
 	server := NewServer("/entry", db)
 	go server.Listen()
-	return http.ListenAndServe(":8080", nil)
+
+	// static files
+	http.Handle("/", http.FileServer(http.Dir("webroot")))
+	//http.Handle("/hello", )
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func newDB(dbURL string) (*sql.DB, error) {

@@ -2,41 +2,33 @@ package internal
 
 import (
 	"database/sql"
-	"github.com/Andronovdima/golang-chat/internal/app/admin"
-	adminrepository "github.com/Andronovdima/golang-chat/internal/app/admin/repository"
-	adminucase "github.com/Andronovdima/golang-chat/internal/app/admin/usecase"
-	"github.com/Andronovdima/golang-chat/internal/app/chat"
-	"github.com/Andronovdima/golang-chat/internal/app/chat/repository"
-	chatusecase "github.com/Andronovdima/golang-chat/internal/app/chat/usecase"
+	"encoding/json"
 	"github.com/Andronovdima/golang-chat/internal/app/message"
-	repository2 "github.com/Andronovdima/golang-chat/internal/app/message/repository"
+	"github.com/Andronovdima/golang-chat/internal/app/message/repository"
 	"github.com/Andronovdima/golang-chat/internal/app/message/usecase"
-	"github.com/Andronovdima/golang-chat/internal/app/support"
-	supportrepository "github.com/Andronovdima/golang-chat/internal/app/support/repository"
-	supportusecase "github.com/Andronovdima/golang-chat/internal/app/support/usecase"
 	"github.com/Andronovdima/golang-chat/internal/model"
-	"golang.org/x/net/websocket"
 	"log"
 	"net/http"
+
+	"golang.org/x/net/websocket"
 )
 
 // Chat server.
 type Server struct {
 	pattern   string
+	//messages  []*Message
 	clients   map[int]*Client
 	addCh     chan *Client
 	delCh     chan *Client
 	sendAllCh chan *model.Message
 	doneCh    chan bool
 	errCh     chan error
-	AdminUcase	admin.Usecase
-	ChatUcase	chat.Usecase
-	MessageUcase	message.Usecase
-	SupportUcase	support.Usecase
+	mesucase	message.Usecase
 }
 
 // Create new app server.
 func NewServer(pattern string, db *sql.DB) *Server {
+	//messages := []*Message{}
 	clients := make(map[int]*Client)
 	addCh := make(chan *Client)
 	delCh := make(chan *Client)
@@ -52,10 +44,7 @@ func NewServer(pattern string, db *sql.DB) *Server {
 		sendAllCh,
 		doneCh,
 		errCh,
-		adminucase.NewAdminUsecase(adminrepository.NewAdminRepository(db)),
-		chatusecase.NewChatUsecase(repository.NewChatRepository(db)),
-		usecase.NewMessageUsecase(repository2.NewMessageRepository(db)),
-		supportusecase.NewSupportUsecase(supportrepository.NewSupportRepository(db)),
+		usecase.NewMessageUsecase(repository.NewMessageRepository(db)),
 	}
 }
 
@@ -80,18 +69,14 @@ func (s *Server) Err(err error) {
 }
 
 func (s *Server) sendPastMessages(c *Client) {
-	messages, err := s.MessageUcase.ListByUser(c.dbId)
-	log.Println(messages)
-	if err != nil {
-		s.errCh <- err
-	}
-
+	messages, _ := s.mesucase.ListByUser(c.userId)
 	for _, msg := range messages {
 		c.Write(msg)
 	}
 }
 
 func (s *Server) sendAll(msg *model.Message) {
+	log.Println("send All:", msg)
 	for _, c := range s.clients {
 		c.Write(msg)
 	}
@@ -124,17 +109,9 @@ func (s *Server) Listen() {
 
 		// Add new a client
 		case c := <-s.addCh:
-			chat, err := s.ChatUcase.FindByUser(c.dbId)
-			if err != nil {
-				chat, err = s.ChatUcase.Create(c.dbId)
-				s.errCh <- err
-			}
-
-			c.chatID = chat.ID
-
+			log.Println("Added new client")
 			s.clients[c.id] = c
 			log.Println("Now", len(s.clients), "clients connected.")
-			log.Println("chat id:", chat.ID)
 			s.sendPastMessages(c)
 
 		// del a client
@@ -144,11 +121,9 @@ func (s *Server) Listen() {
 
 		// broadcast message for all clients
 		case msg := <-s.sendAllCh:
-			err := s.MessageUcase.Create(msg)
-			log.Println("Created in db:", msg)
-			if err != nil {
-				s.errCh <- err
-			}
+			log.Println("Send all:", msg)
+			_ = s.mesucase.Create(msg)
+			//s.messages = append(s.messages, msg)
 			s.sendAll(msg)
 
 		case err := <-s.errCh:
@@ -157,5 +132,13 @@ func (s *Server) Listen() {
 		case <-s.doneCh:
 			return
 		}
+	}
+}
+
+func (s *Server) MainHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	str := "hello from server"
+	if &str != nil {
+		_ = json.NewEncoder(w).Encode(&str)
 	}
 }
