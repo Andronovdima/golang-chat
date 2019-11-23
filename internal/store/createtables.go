@@ -1,7 +1,6 @@
 package store
 
 import "database/sql"
-
 func CreateTables(db *sql.DB) error {
 	supportsQuery := `CREATE TABLE IF NOT EXISTS supports (
 		id bigserial not null primary key,
@@ -53,5 +52,3 @@ func CreateTables(db *sql.DB) error {
 		return err
 	}
 
-	return nil
-}
