@@ -21,7 +21,7 @@ func (r *MessageRepository) Create(message *model.Message) error {
 		message.ChatID,
 		message.SenderID,
 		message.ReceiverID,
-		message.Message,
+		message.Body,
 		message.Date,
 	).Scan(&message.ID)
 }
@@ -38,7 +38,7 @@ func (r *MessageRepository) ListByUser(id int64) ([]*model.Message, error) {
 
 	for rows.Next() {
 		m := &model.Message{}
-		err := rows.Scan(&m.ID, &m.ChatID, &m.SenderID, &m.ReceiverID, &m.Message, &m.Date)
+		err := rows.Scan(&m.ID, &m.ChatID, &m.SenderID, &m.ReceiverID, &m.Body, &m.Date)
 		if err != nil {
 			return nil, err
 		}
@@ -62,7 +62,7 @@ func (r *MessageRepository) ListBySupport(supportId int64, chatId int64) ([]*mod
 
 	for rows.Next() {
 		m := &model.Message{}
-		err := rows.Scan(&m.ID, &m.ChatID, &m.SenderID, &m.ReceiverID, &m.Message, &m.Date)
+		err := rows.Scan(&m.ID, &m.ChatID, &m.SenderID, &m.ReceiverID, &m.Body, &m.Date)
 		if err != nil {
 			return nil, err
 		}

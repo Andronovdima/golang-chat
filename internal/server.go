@@ -135,8 +135,9 @@ func (s *Server) Listen() {
 
 		// broadcast message for all clients
 		case msg := <-s.sendAllCh:
-			log.Println("Send all:", msg)
+			msg.SenderID = 1
 			err := s.MessageUcase.Create(msg)
+			log.Println("Created in db:", msg)
 			if err != nil {
 				s.errCh <- err
 			}
