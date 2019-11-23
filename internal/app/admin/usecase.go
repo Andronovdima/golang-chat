@@ -2,7 +2,6 @@ package admin
 
 import "github.com/Andronovdima/golang-chat/internal/model"
 
-type Repository interface {
-	Create(admin *model.Admin) error
+type Usecase interface {
 	Find(id int64) (*model.Admin, error)
 }

@@ -1,4 +1,4 @@
-package apiserver
+package internal
 
 type Config struct {
 	BindAddr    string
@@ -10,10 +10,10 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
-		BindAddr:		":8070",
+		BindAddr:		":8080",
 		LogLevel:		"debug",
 		SessionKey:		"jdfhdfdj",
-		DatabaseURL:	"host=localhost dbname=postgres sslmode=disable port=5431 password=1234 user=d",
+		DatabaseURL:	"host=localhost dbname=postgres sslmode=disable port=5432 password=1234 user=d",
 		ClientUrl:		"http://127.0.0.1:9000",
 		//ClientUrl:		"https://comandus.now.sh",
 	}

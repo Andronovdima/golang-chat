@@ -2,7 +2,7 @@
 package main
 
 import (
-	apiserver "Golang/FworkChat/golang-chat/internal"
+	apiserver "github.com/Andronovdima/golang-chat/internal"
 	"log"
 )
 

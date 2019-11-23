@@ -16,9 +16,8 @@ func NewAdminRepository(db *sql.DB) admin.Repository {
 
 func (r *AdminRepository) Create(admin *model.Admin) error {
 	return r.db.QueryRow(
-		"INSERT INTO admins (id, user_id) " +
-			"VALUES ($1, $2) RETURNING id",
-		admin.ID,
+		"INSERT INTO admins (user_id) " +
+			"VALUES ($1) RETURNING id",
 		admin.UserID,
 	).Scan(&admin.ID)
 }
