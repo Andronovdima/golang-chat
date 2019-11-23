@@ -1,8 +1,9 @@
 package apiserver
 
 import (
-	"Golang/FworkChat/golang-chat/internal/store"
 	"database/sql"
+	"github.com/Andronovdima/golang-chat/internal/store"
+	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
