@@ -134,6 +134,7 @@ func (c *Client) listenRead() {
 				} else {
 					var msg model.Message
 					msg.SenderID = c.userId
+					msg.Body = input.Payload.Message
 					err := c.server.MesUcase.Create(&msg)
 					if err != nil {
 						c.server.errCh <- err
