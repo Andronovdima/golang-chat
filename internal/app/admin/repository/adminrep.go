@@ -1,7 +1,7 @@
 package adminrepository
 
 import "database/sql"
-//import "github.com/golang-chat/internal/"
+import "gith"//"github.com/golang-chat/internal/app/admin"
 
 type AdminRepository struct {
 	db *sql.DB
